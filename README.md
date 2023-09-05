@@ -1,5 +1,11 @@
 # ThreeD Hub
 
+![GitHub language count](https://img.shields.io/github/languages/count/Gusttavo-Larios/threed-hub?style=for-the-badge)
+![GitHub top language](https://img.shields.io/github/languages/top/Gusttavo-Larios/threed-hub?style=for-the-badge&color=orange)
+![GitHub](https://img.shields.io/github/license/Gusttavo-Larios/threed-hub?style=for-the-badge&color=green)
+
+
+
 ![Thumbnail](https://github.com/Gusttavo-Larios/threed-hub/assets/72306241/3324362e-fd30-42ef-b8dc-a442c6fe466b)
 
 ## Justificativa
