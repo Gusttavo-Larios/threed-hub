@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('post_image', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('path', 56);
-            $table->string('name', 16);
+            $table->string('path', 72);
+            $table->string('name', 36);
             $table->timestamps();
         });
     }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('full_name', 56);
             $table->string('email', 56)->unique();
-            $table->string('password',20);
+            $table->string('password',72);
             $table->uuid('administrator_id');
             $table->foreign('administrator_id')->references('id')->on('administrator');
             $table->timestamps();

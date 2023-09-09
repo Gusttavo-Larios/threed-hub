@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('material', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name', 16);
-            $table->string('color', 16);
+            $table->string('name', 20);
+            $table->string('color', 7);
             $table->timestamps();
         });
     }
