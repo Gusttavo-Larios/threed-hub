@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Client as ClientModel;
 use App\UseCases\ClientUseCase;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+
 
 class ClientController extends Controller
 {
@@ -17,7 +17,7 @@ class ClientController extends Controller
 
     public function __construct()
     {
-        $this->client_use_case = new ClientUseCase(new ClientModel());
+        $this->client_use_case = new ClientUseCase(new ClientModel);
         $this->error_adapter = new ErrorAdapter();
     }
 
@@ -46,6 +46,24 @@ class ClientController extends Controller
             $store_client_response = $this->client_use_case->store($client);
 
             return response($store_client_response, 200);
+        } catch (\Throwable $th) {
+            $error = $this->error_adapter->prepare_data($th->getMessage(), $th->getCode());
+
+            return response([
+                'message' =>  $error['error_message']
+            ], $error['error_code']);
+        }
+    }
+
+    public function login(Request $request)
+    {
+        try {
+            $client_email = $request->input('email');
+            $client_password = $request->input('password');
+
+            $token = $this->client_use_case->authenticate($client_email, $client_password);
+
+            return response(['token' => $token], 200);
         } catch (\Throwable $th) {
             $error = $this->error_adapter->prepare_data($th->getMessage(), $th->getCode());
 
