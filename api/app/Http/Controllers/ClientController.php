@@ -2,23 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Adapters\ErrorAdapter;
-use App\Entities\Client;
 use App\Http\Controllers\Controller;
-use App\Models\Client as ClientModel;
-use App\UseCases\ClientUseCase;
 use Illuminate\Http\Request;
 
+use App\Application\EntitiesImpl\ClientEntityImpl;
+use App\Application\UseCaseImpl\MaintainRegistrationUseCaseImpl;
+
+use App\Helpers\HandleHttpException;
 
 class ClientController extends Controller
 {
-    private ClientUseCase $client_use_case;
-    private ErrorAdapter $error_adapter;
+
+    private MaintainRegistrationUseCaseImpl $maintain_registration_use_case_impl;
 
     public function __construct()
     {
-        $this->client_use_case = new ClientUseCase(new ClientModel);
-        $this->error_adapter = new ErrorAdapter();
+        $this->maintain_registration_use_case_impl = new MaintainRegistrationUseCaseImpl();
     }
 
 
@@ -36,49 +35,54 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         try {
-            $client = new Client(
+            $client = new ClientEntityImpl(
+                null,
                 $request->input('full_name'),
                 $request->input('email'),
                 $request->input('phone_number'),
                 $request->input('password')
             );
 
-            $store_client_response = $this->client_use_case->store($client);
-
-            return response($store_client_response, 200);
-        } catch (\Throwable $th) {
-            $error = $this->error_adapter->prepare_data($th->getMessage(), $th->getCode());
+            $new_client = $this->maintain_registration_use_case_impl->create_client(
+                $client
+            );
 
             return response([
-                'message' =>  $error['error_message']
-            ], $error['error_code']);
+                'id' => $new_client->get_id(),
+                'full_name' => $new_client->get_full_name(),
+                'email' => $new_client->get_email(),
+                'phone_number' => $new_client->get_phone_number(),
+            ]);
+        } catch (\Throwable $th) {
+            return response([
+                'message' => $th->getMessage()
+            ], HandleHttpException::handle_error_code($th->getCode()));
         }
     }
 
-    public function login(Request $request)
-    {
-        try {
-            $client_email = $request->input('email');
-            $client_password = $request->input('password');
-
-            $token = $this->client_use_case->authenticate($client_email, $client_password);
-
-            return response(['token' => $token], 200);
-        } catch (\Throwable $th) {
-            $error = $this->error_adapter->prepare_data($th->getMessage(), $th->getCode());
-
-            return response([
-                'message' =>  $error['error_message']
-            ], $error['error_code']);
-        }
-    }
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-        //
+        try {
+
+            $client = $this->maintain_registration_use_case_impl->read_client(
+                $id
+            );
+
+            return response([
+                'id' => $client->get_id(),
+                'full_name' => $client->get_full_name(),
+                'email' => $client->get_email(),
+                'phone_number' => $client->get_phone_number(),
+            ]);
+        } catch (\Throwable $th) {
+            return response([
+                'message' => $th->getMessage()
+            ], HandleHttpException::handle_error_code($th->getCode()));
+        }
     }
 
     /**
@@ -86,7 +90,29 @@ class ClientController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+
+            $client = new ClientEntityImpl(
+                null,
+                $request->input('full_name'),
+                $request->input('email'),
+                $request->input('phone_number'),
+                $request->input('password')
+            );
+
+            $this->maintain_registration_use_case_impl->update_client(
+                $id,
+                $client
+            );
+
+            return response([
+                'message' => 'Cliente atualizado com sucesso!'
+            ]);
+        } catch (\Throwable $th) {
+            return response([
+                'message' => $th->getMessage()
+            ], HandleHttpException::handle_error_code($th->getCode()));
+        }
     }
 
     /**
@@ -94,6 +120,19 @@ class ClientController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+
+            $this->maintain_registration_use_case_impl->delete_client(
+                $id
+            );
+
+            return response([
+                'message' => 'Cliente exluído com sucesso!'
+            ]);
+        } catch (\Throwable $th) {
+            return response([
+                'message' => $th->getMessage()
+            ], HandleHttpException::handle_error_code($th->getCode()));
+        }
     }
 }

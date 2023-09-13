@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\ClientController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,9 +18,13 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-// Route::prefix('/api')->group(function () {
+Route::middleware('auth')->group(function () {
     Route::controller(ClientController::class)->group(function () {
-        Route::post('/client', 'store');
-        Route::post('/client/login', 'login');
+        Route::post('/client', 'store')->withoutMiddleware('auth');
+        Route::get('/client/{id}', 'show');
+        Route::put('/client/{id}', 'update');
+        Route::delete('/client/{id}', 'destroy');
+
+        // Route::post('/client/login', 'login')->withoutMiddleware('auth');
     });
-// });
+});
